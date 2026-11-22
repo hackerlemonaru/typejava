@@ -65,3 +65,33 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/release-assets
+          cp \
+            "lib/build/libs/typejava-$VERSION.jar" \
+            "lib/build/libs/typejava-$VERSION-sources.jar" \
+            "lib/build/libs/typejava-$VERSION-javadoc.jar" \
+            "cli/build/libs/typejava-$VERSION-all.jar" \
+            build/release-assets/
+          cd build/release-assets
+
+          sha256sum \
+            "typejava-$VERSION.jar" \
+            "typejava-$VERSION-sources.jar" \
+            "typejava-$VERSION-javadoc.jar" \
+            "typejava-$VERSION-all.jar" \
+            > SHA256SUMS
+
+          prerelease=()
+          if [[ "$VERSION" == *-* ]]; then
+            prerelease+=(--prerelease)
+          fi
+
+          gh release create "$GITHUB_REF_NAME" \
+            "typejava-$VERSION.jar" \
+            "typejava-$VERSION-sources.jar" \
+            "typejava-$VERSION-javadoc.jar" \
+            "typejava-$VERSION-all.jar" \
+            SHA256SUMS \
+            --title "TypeJava $VERSION" \
+            --generate-notes \
+            --verify-tag \
+            "${prerelease[@]}"
