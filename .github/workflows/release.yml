@@ -21,3 +21,20 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GITHUB_TOKEN: ${{ github.token }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          if [[ ! "$tag" =~ ^typejava-v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag '$tag' is not a valid TypeJava release tag (expected typejava-vX.Y.Z)"
+            exit 1
+          fi
+
+          version="${tag#typejava-v}"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+          git fetch origin main --no-tags
