@@ -94,3 +94,23 @@ Always run `nix develop --command gradle build` before finishing a change.
 - `cli/build/libs/typejava-<version>-all.jar` — self-contained CLI jar
 - `examples/build/libs/typejava-examples-<version>.jar` — examples module
 
+The CLI fat jar is built by the `:cli:cliJar` task and attached to `:cli:assemble`, so root
+`gradle build` includes it. Never make the `:lib` jar fat: its POM declares ASM as a normal
+dependency.
+
+The published Maven coordinates stay `cc.kilonode:typejava:<version>` even though the module
+directory is `lib`. Do not publish under `cc.kilonode:lib`.
+
+Version resolution:
+
+- Release CI passes `-Pversion=<tag-version>`.
+- Local builds fall back to `VERSION_NAME` in `gradle.properties`.
+- Never mutate `gradle.properties` in CI to set a release version.
+
+## CI
+
+`.github/workflows/ci.yml` runs on pull requests and pushes to `main` only. It runs
+`gradle --no-daemon build`, caches Gradle state, and cancels superseded runs. There are no
+snapshot-building or snapshot-publishing workflows.
+
+## Releases
