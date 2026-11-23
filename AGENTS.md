@@ -61,3 +61,36 @@ nix develop --command gradle :examples:run
 
 Run one example:
 
+```bash
+nix develop --command gradle :examples:run --args="objects"
+```
+
+Run the JMH benchmarks (compilation is excluded; see `benchmarks/README.md`):
+
+```bash
+nix develop --command gradle :benchmarks:jmh
+```
+
+Run a single benchmark:
+
+```bash
+nix develop --command gradle :benchmarks:jmh --args="LogClassificationBenchmark.typeJava"
+```
+
+Update lexer snapshots when token output intentionally changes:
+
+```bash
+nix develop --command env UPDATE_SNAPSHOTS=true \
+  gradle :lib:test --tests 'cc.kilonode.typejava.lexer.LexerSnapshotTest' --rerun-tasks
+```
+
+Always run `nix develop --command gradle build` before finishing a change.
+
+## Build outputs
+
+- `lib/build/libs/typejava-<version>.jar` — thin library jar for Maven consumers
+- `lib/build/libs/typejava-<version>-sources.jar`
+- `lib/build/libs/typejava-<version>-javadoc.jar`
+- `cli/build/libs/typejava-<version>-all.jar` — self-contained CLI jar
+- `examples/build/libs/typejava-examples-<version>.jar` — examples module
+
