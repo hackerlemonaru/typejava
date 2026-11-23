@@ -29,3 +29,35 @@ Do not grow `README.md` into a language or integration manual; extend the approp
 - `:examples` — runnable public-API demos. Depends only on `:lib`.
 - `:benchmarks` — JMH harness comparing TypeJava with plain Java, Groovy, BeanShell, and Rhino.
   Depends on `:lib` plus benchmark-only language runtimes.
+
+Dependency direction is `:cli -> :lib`, `:examples -> :lib`, and `:benchmarks -> :lib`. `:lib` must
+not depend on any of them. Do not publish `:cli`, `:examples`, or `:benchmarks` yet. Groovy,
+BeanShell, and Rhino must stay `implementation` dependencies of `:benchmarks` and must never appear
+in `:lib` or its published POM.
+
+## Commands
+
+Use the Nix dev shell:
+
+```bash
+nix develop --command gradle check
+nix develop --command gradle build
+```
+
+`build` runs all module tests, produces the thin library jar, sources/javadoc jars, and the fat CLI
+jar.
+
+Run the CLI:
+
+```bash
+nix develop --command gradle :cli:run --args="path/to/script.tj"
+```
+
+Run all examples:
+
+```bash
+nix develop --command gradle :examples:run
+```
+
+Run one example:
+
