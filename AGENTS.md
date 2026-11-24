@@ -114,3 +114,41 @@ Version resolution:
 snapshot-building or snapshot-publishing workflows.
 
 ## Releases
+
+Only tagged commits are published. Internal release rule: **no snapshots, no per-commit packages,
+no untagged releases.**
+
+Tag format: `typejava-vX.Y.Z` (full SemVer; prerelease suffixes are allowed, e.g.
+`typejava-v0.2.0-rc.1`).
+
+```bash
+git tag typejava-v0.2.0
+git push origin typejava-v0.2.0
+```
+
+`.github/workflows/release.yml`:
+
+1. Validates the tag against `typejava-vX.Y.Z`.
+2. Requires the tagged commit to be on `main`.
+3. Runs `gradle build :lib:publish -Pversion=<version>`.
+4. Publishes only `cc.kilonode:typejava:<version>` to GitHub Packages.
+5. Creates a GitHub Release with the thin/sources/javadoc/CLI jars plus `SHA256SUMS`.
+
+Prerelease versions create prerelease GitHub Releases. Do not move or reuse a published tag.
+Never run bare root `publish`; publish `:lib:publish` explicitly.
+
+GitHub Packages requires authentication even for public Maven packages, using a classic PAT with
+`read:packages`. Maven Central is the intended future path for credential-free consumption.
+
+The Gradle publishing repository is only configured when `GITHUB_REPOSITORY` and `GITHUB_TOKEN` are
+present and the version is not a `-SNAPSHOT`. This prevents accidental snapshot publishing.
+
+## Architecture
+
+- `:lib` `lexer/`, `parser/`, `ast/` — front end
+- `:lib` `checker/` — nominal type checking, null narrowing, resolved symbols/types, record
+  bindings, and export signature validation
+- `:lib` `codegen/` — ASM generation; object types get an abstract base class per nominal type and
+  a subclass per method-bearing object-literal site; record-bound types use the host record class;
+  generated programs are instance-based with isolated top-level state
+- `:lib` `runtime/` — `Console`, `TjArray`, `TjMap`, `Boundary`, and value formatting
