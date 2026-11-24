@@ -27,3 +27,33 @@ TypeJava.run("console.log(\"hello\");", Environment.standard());
 ```
 
 `Environment.standard()` binds `TjArray` and `TjMap` and writes `console.log` output to
+`System.out`. Build a custom environment when you need different output, records, export contracts,
+or native types.
+
+### Custom environment and output
+
+`Io` receives already formatted console lines. It has a default `println` method, so implementations
+are usually anonymous classes:
+
+```java
+List<String> lines = new ArrayList<>();
+
+Environment environment =
+    TypeJava.environment()
+        .io(
+            new Io() {
+              @Override
+              public void println(String line) {
+                lines.add(line);
+              }
+            })
+        .withStd()
+        .build();
+
+TypeJava.run("console.log(\"hello\", 42);", environment);
+```
+
+`withStd()` is shorthand for `withArray().withMap()`. Without it, `TjArray` and `TjMap` are unknown
+types. `withArray()` and `withMap()` can be used separately.
+
+### Compile once, instantiate many times
