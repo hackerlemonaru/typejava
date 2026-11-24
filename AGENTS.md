@@ -152,3 +152,25 @@ present and the version is not a `-SNAPSHOT`. This prevents accidental snapshot 
   a subclass per method-bearing object-literal site; record-bound types use the host record class;
   generated programs are instance-based with isolated top-level state
 - `:lib` `runtime/` — `Console`, `TjArray`, `TjMap`, `Boundary`, and value formatting
+- `:lib` `TypeJava` / `CompiledProgram` / `ProgramInstance` — public `compile`/`run`/`runFile`,
+  `instantiate`, and exported-function bridge API plus the generated classloader
+- `:lib` `Environment` — `Io`, native types, record bindings, expected export interfaces, and
+  TypeScript declaration generation
+- `:cli` `Main` — argument parsing, file execution, usage, and exit codes
+- `:examples` `Main` — loads `.tj` resources and demonstrates only the public `TypeJava` API
+- `:benchmarks` — precompiles/parses every language workload in JMH setup so script compilation is
+  never measured; compares Java, TypeJava, Groovy, BeanShell, and Rhino on the same business rules
+
+## Constraints
+
+- Java 21.
+- Nominal object types; no structural assignability for named types.
+- Only nullable unions: `T | null`.
+- Generics: type declarations and explicit type arguments only.
+- No imports/modules, exceptions, inheritance, overloads, lambdas/first-class functions,
+  array/map literals, optional properties, `undefined`, general unions, type switches, or generic
+  functions/methods.
+- Compilation is fail-fast; no error recovery or warnings.
+- Examples must not depend on test fixtures or compiler internals.
+- Do not add source comments unless requested.
+- Do not commit unless the user explicitly asks.
