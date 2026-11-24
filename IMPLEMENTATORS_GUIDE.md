@@ -57,3 +57,18 @@ TypeJava.run("console.log(\"hello\", 42);", environment);
 types. `withArray()` and `withMap()` can be used separately.
 
 ### Compile once, instantiate many times
+
+```java
+CompiledProgram program = TypeJava.compile(source, environment);
+
+program.run();  // creates and runs one instance
+program.run();  // creates a separate instance with fresh top-level state
+```
+
+`CompiledProgram` is immutable and can be shared between threads. `run()` is a convenience that
+instantiates a program and discards the instance.
+
+Use `instantiate()` when you need to call into the program:
+
+```java
+ProgramInstance first = program.instantiate();
