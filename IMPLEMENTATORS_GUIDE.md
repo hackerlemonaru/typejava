@@ -248,3 +248,40 @@ and your own standard-library-like APIs are bound.
 ```java
 public final class Counter {
   private double value;
+
+  public static Counter create() {
+    return new Counter();
+  }
+
+  public void add(double amount) {
+    value += amount;
+  }
+
+  public double value() {
+    return value;
+  }
+}
+```
+
+```java
+NativeType counter =
+    NativeType.of("Counter", Counter.class)
+        .factory("create", "()Lcom/example/Counter;", "Counter")
+        .instanceMethod("add", "(D)V", "void", "number")
+        .instanceMethod("value", "()D", "number");
+
+Environment environment = TypeJava.environment().bind(counter).build();
+```
+
+```ts
+const counter: Counter = Counter.create();
+counter.add(2);
+counter.add(3);
+console.log(counter.value());
+```
+
+### Native type definitions
+
+`NativeType.of(name, hostClass)` creates a definition. The name is the TypeJava name and must be a
+valid identifier.
+
