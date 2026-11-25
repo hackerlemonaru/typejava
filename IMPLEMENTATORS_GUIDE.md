@@ -216,3 +216,35 @@ Java interface method is a compile error, not a runtime surprise.
 Annotate a record component with `@MaybeNull` to map a reference component to `T | null`:
 
 ```java
+public record Labeled(double value, @MaybeNull String label) {}
+```
+
+Primitive components cannot use `@MaybeNull`. For record components, `Double` and `Boolean` are
+treated as non-null unless annotated; the annotation is what makes them nullable.
+
+Source redeclaration of a bound record, when used, must match the record order-independently: same
+field set, same types, and `readonly` on every field.
+
+### Boundary validation
+
+At an exported function entry point:
+
+- Non-null `String` parameters are checked.
+- Non-null record parameters are checked recursively.
+- Nullable records and strings are allowed to be null.
+- Non-null native parameters, including `TjArray` and `TjMap`, are checked for the outer reference,
+  but their contents are not inspected.
+- Exported return values are not deeply validated by generated code.
+
+The nested checks exist because Java records can contain nulls that TypeJava's type system says are
+impossible. A failure is an `IllegalArgumentException` that includes the parameter or component
+path. Treat a boundary failure as a host integration error.
+
+## Custom native types
+
+A native type exposes an existing Java class to TypeJava. Native types are how `TjArray`, `TjMap`,
+and your own standard-library-like APIs are bound.
+
+```java
+public final class Counter {
+  private double value;
