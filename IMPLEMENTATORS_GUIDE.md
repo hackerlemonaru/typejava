@@ -285,3 +285,20 @@ console.log(counter.value());
 `NativeType.of(name, hostClass)` creates a definition. The name is the TypeJava name and must be a
 valid identifier.
 
+- `typeParameters("T", ...)` declares generic parameters.
+- `factory(name, descriptor, returnType)` declares a zero-argument factory callable as
+  `Type.create()`.
+- `staticMethod(name, descriptor, returnType, parameterTypes...)` declares a static method.
+- `instanceMethod(name, descriptor, returnType, parameterTypes...)` declares a method callable on
+  values of that type.
+
+The descriptor is the JVM method descriptor, for example `(ILjava/lang/String;)Z`. The return type
+and parameter types after the descriptor are TypeJava type references such as `number`, `string`,
+`T`, `TjArray<T>`, or another native type name.
+
+Factories are special: TypeJava requires the destination to be annotated, because
+`Type.create()` has no arguments from which to infer type parameters:
+
+```ts
+const numbers: TjArray<number> = TjArray.create();
+```
