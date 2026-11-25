@@ -169,3 +169,30 @@ redeclaration is a compile error; the bound Java record remains authoritative.
 
 ```java
 CompiledProgram program = TypeJava.compile(source, environment);
+ProgramInstance instance = program.instantiate();
+
+LogApi api = instance.exports(LogApi.class);
+Payload result = api.analyzeLog(new Payload(0));
+
+Object dynamic = instance.invoke("analyzeLog", new Payload(1));
+```
+
+`exports(LogApi.class)` returns a JDK proxy. Every abstract method on the interface must have a
+matching exported function with a compatible name, arity, and host signature. The proxy call is
+not cached; each method call goes through the same invocation path as `invoke`.
+
+`program.exports()` returns a map of exported names to `ExportSignature` values. This is useful for
+diagnostics or building dynamic adapters.
+
+### Export contracts
+
+`exports(Class<?>...)` records expected interfaces. During compilation, every abstract method in the
+interface must have a matching `export function`; otherwise compilation fails. Extra exported
+functions are allowed.
+
+Exported functions must use types that can cross the host boundary:
+
+- `number`, `string`, `boolean`, and `void`.
+- Nullable variants using the Java wrapper for primitives and `String` for strings.
+- Bound record classes.
+- Bound native types such as `TjArray` and `TjMap`.
