@@ -134,3 +134,38 @@ public record Payload(double incrementMe) {}
 public interface LogApi {
   Payload analyzeLog(Payload payload);
 
+  double invocationCount();
+}
+```
+
+```java
+Environment environment =
+    TypeJava.environment()
+        .record(Payload.class)
+        .exports(LogApi.class)
+        .build();
+```
+
+The record's simple name becomes the TypeJava type name. TypeJava source can use `Payload` directly,
+without declaring it:
+
+```ts
+let invocations: number = 0;
+
+export function analyzeLog(payload: Payload): Payload {
+  invocations = invocations + 1;
+  return { incrementMe: payload.incrementMe + 1 };
+};
+
+export function invocationCount(): number {
+  return invocations;
+};
+```
+
+The source may also redeclare the record as an identical readonly object type. A different
+redeclaration is a compile error; the bound Java record remains authoritative.
+
+### Call exports
+
+```java
+CompiledProgram program = TypeJava.compile(source, environment);
