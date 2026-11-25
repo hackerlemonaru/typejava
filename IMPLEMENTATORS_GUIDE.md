@@ -196,3 +196,23 @@ Exported functions must use types that can cross the host boundary:
 - Nullable variants using the Java wrapper for primitives and `String` for strings.
 - Bound record classes.
 - Bound native types such as `TjArray` and `TjMap`.
+
+The host signature mapping is checked at compile time. A mismatch between the TypeJava type and the
+Java interface method is a compile error, not a runtime surprise.
+
+### Record rules
+
+- The record and all enclosing classes must be public.
+- The record must not declare type parameters.
+- Record component names become TypeJava field names.
+- Bound records must have unique simple names; the simple name is the TypeJava type name.
+- A record nested inside another record must also be bound.
+- Record components can use `double`, `int`, `boolean`, `String`, `Double`, `Boolean`, or another
+  bound record.
+- Non-null reference components are validated recursively when a record crosses an export
+  parameter boundary. Nullable components are allowed to be null.
+- Record-backed TypeJava fields are readonly.
+
+Annotate a record component with `@MaybeNull` to map a reference component to `T | null`:
+
+```java
