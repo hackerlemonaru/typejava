@@ -104,3 +104,33 @@ and the program may still fail at runtime.
 `IOException` if the file cannot be read.
 
 ### Public API at a glance
+
+| API | Purpose |
+|---|---|
+| `TypeJava.run(source, environment)` | Compile and run one instance. |
+| `TypeJava.compile(source, environment)` | Parse, check, and generate bytecode once. |
+| `TypeJava.check(source, environment)` | Validate without running; returns diagnostics. |
+| `TypeJava.checkFile(path, environment)` | Read and validate a `.tj` file; returns diagnostics. |
+| `TypeJava.runFile(path, environment)` | Read, compile, and run a `.tj` file. |
+| `CompiledProgram.run()` | Instantiate and run, discarding the instance. |
+| `CompiledProgram.instantiate()` | Create an isolated `ProgramInstance`. |
+| `CompiledProgram.exports()` | Inspect exported function signatures. |
+| `ProgramInstance.invoke(name, args...)` | Call an export without a typed interface. |
+| `ProgramInstance.exports(Api.class)` | Get a typed proxy over exports. |
+| `Environment.typeScriptDeclarations()` | Generate ambient `.d.ts` contents. |
+
+## Exported functions
+
+Exported functions are top-level functions marked with `export`. They are the supported bridge from
+Java into a program instance.
+
+### Java records as TypeJava types
+
+Bind a Java record with `record(Class<?>)`:
+
+```java
+public record Payload(double incrementMe) {}
+
+public interface LogApi {
+  Payload analyzeLog(Payload payload);
+
