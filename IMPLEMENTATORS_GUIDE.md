@@ -375,3 +375,22 @@ interface ArrayApi {
 The output is an ambient declaration file, so it can be included directly in a TypeScript project or
 loaded into Monaco:
 
+```ts
+fetch("/typejava.d.ts")
+    .then((response) => response.text())
+    .then((declarations) => {
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(
+          declarations,
+          "file:///typejava.d.ts"
+      );
+    });
+```
+
+The declarations give TypeScript-powered completion and diagnostics access to TypeJava types. They
+do not make Monaco parse `.tj` files by themselves; a TypeJava language contribution still needs
+tokens, bracket rules, and a way to route the file to a language service.
+
+For a `tsconfig`, include the file normally:
+
+```json
+{
