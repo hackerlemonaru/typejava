@@ -323,3 +323,21 @@ The built-in `TjArray` and `TjMap` definitions in `Environment` are complete exa
 instance methods, generic parameters, and type variables.
 
 ## TypeScript declarations
+
+`Environment.typeScriptDeclarations()` generates an ambient `.d.ts` file from the environment:
+
+```java
+Files.writeString(Path.of("typejava.d.ts"), environment.typeScriptDeclarations());
+```
+
+The generated file contains:
+
+- Native types as interfaces, plus a companion `declare const` for static methods and factories.
+- Bound records as readonly interfaces.
+- Export interfaces from `exports(...)`.
+
+Generic native types keep their type parameters. For example, the standard array produces:
+
+```ts
+interface TjArray<T> {
+  size(): number;
