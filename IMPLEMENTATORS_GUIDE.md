@@ -414,3 +414,22 @@ class or native type the script expects; do not rely on structural shape.
 - Java records are immutable in practice because their components are final.
 - Returned or passed arrays and maps are the same mutable runtime objects, not copies.
 
+If scripts must not mutate host collections, expose a read-only native wrapper instead of giving
+them a mutable type.
+
+### Numbers
+
+Every TypeJava `number` is a JVM `double`.
+
+- Export interface methods use `double` for non-null numbers and `Double` for nullable numbers.
+- Record components may use `double` or `int`; both appear as TypeJava `number`.
+- There is no integer, long, float, or big-decimal distinction in the language.
+- Whole-number doubles are formatted without a decimal suffix by `console.log`.
+
+### Top-level state
+
+Top-level variables are instance fields. `CompiledProgram.instantiate()` creates fresh state.
+There are no process-wide TypeJava globals. Functions and object methods can read and mutate
+top-level state within their instance.
+
+### Equality
