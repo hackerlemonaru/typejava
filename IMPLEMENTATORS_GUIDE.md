@@ -341,3 +341,37 @@ Generic native types keep their type parameters. For example, the standard array
 ```ts
 interface TjArray<T> {
   size(): number;
+  get(arg0: number): T;
+  add(arg0: T): void;
+}
+
+declare const TjArray: {
+  create<T>(): TjArray<T>;
+};
+```
+
+The declarations describe the environment, not type aliases declared only inside a script. Bind a
+record or native type if TypeScript tooling needs to know about it.
+
+### Nullability in declarations
+
+Java erasure and `String` cannot express whether a reference was nullable. For export interfaces:
+
+- `@MaybeNull` on a parameter or method return adds `| null`.
+- `Double` and `Boolean` are emitted as nullable numbers and booleans.
+- `@MaybeNull` on interface methods is a declaration hint. It does not change runtime validation.
+
+Generic arguments on export interface methods are erased, so they appear as `unknown`:
+
+```ts
+interface ArrayApi {
+  numbers(): TjArray<unknown>;
+  size(arg0: TjArray<unknown>): number;
+}
+```
+
+### Monaco and other TypeScript tooling
+
+The output is an ambient declaration file, so it can be included directly in a TypeScript project or
+loaded into Monaco:
+
