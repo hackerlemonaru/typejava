@@ -302,3 +302,24 @@ Factories are special: TypeJava requires the destination to be annotated, becaus
 ```ts
 const numbers: TjArray<number> = TjArray.create();
 ```
+
+Native methods are direct calls. Method references are not values and cannot be stored or passed
+around. Bind a native type before compiling; definitions are immutable once resolved.
+
+If a JVM method starts with an `Environment` parameter, the runtime injects the active environment
+automatically. Such a descriptor starts with `(Lcc/kilonode/typejava/Environment;`. Do not include
+the environment in the TypeJava parameter type list:
+
+```java
+NativeType.of("Host", Host.class)
+    .staticMethod(
+        "print",
+        "(Lcc/kilonode/typejava/Environment;Ljava/lang/String;)V",
+        "void",
+        "string");
+```
+
+The built-in `TjArray` and `TjMap` definitions in `Environment` are complete examples of factories,
+instance methods, generic parameters, and type variables.
+
+## TypeScript declarations
