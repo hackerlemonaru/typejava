@@ -394,3 +394,23 @@ For a `tsconfig`, include the file normally:
 
 ```json
 {
+  "include": ["src/**/*.ts", "typejava.d.ts"]
+}
+```
+
+## Semantics at the boundary
+
+### Nominal types
+
+Object types are nominal. A Java record becomes one named TypeJava type. Two records or object types
+with identical fields are not interchangeable. When crossing the boundary, use the bound record
+class or native type the script expects; do not rely on structural shape.
+
+### Immutability
+
+- `readonly` is a compile-time TypeJava check and is shallow.
+- `const` prevents rebinding a variable, not mutating an object.
+- `TjArray` and `TjMap` are mutable.
+- Java records are immutable in practice because their components are final.
+- Returned or passed arrays and maps are the same mutable runtime objects, not copies.
+
