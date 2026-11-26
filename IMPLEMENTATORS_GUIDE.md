@@ -433,3 +433,34 @@ There are no process-wide TypeJava globals. Functions and object methods can rea
 top-level state within their instance.
 
 ### Equality
+
+- Numbers and booleans compare by value.
+- Strings compare by value.
+- Nullable values can be compared with `null`.
+- Java records compare using the record's generated `equals`.
+- Ordinary TypeJava object literals have no generated `equals` override and compare by identity.
+
+### Closures and function values
+
+There are no closures or first-class functions. A top-level function cannot capture local variables.
+Object methods are the only way to attach behavior to data, and methods cannot be extracted as
+values. Design host APIs around direct function and method calls.
+
+### Exceptions
+
+TypeJava has no language-level exceptions, `throw`, or `try` / `catch`.
+
+- Compile failures throw `LexerException`, `ParseException`, or `CheckException`.
+- Runtime exceptions from generated code and native methods escape to the caller.
+- Checked exceptions thrown by native methods are wrapped in `RuntimeException` by the invocation
+  bridge.
+
+### Fail-fast compilation
+
+Compilation stops at the first lexical, syntax, or type error. There is no error recovery and there
+are no warnings. Compile before serving traffic, and treat a compile failure as a configuration
+error for the script or rule set.
+
+## Maintenance
+
+Build, test, release, CI, and benchmark commands are in [AGENTS.md](AGENTS.md).
