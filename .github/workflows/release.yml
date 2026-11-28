@@ -36,3 +36,41 @@ jobs:
 
           version="${tag#typejava-v}"
           echo "VERSION=$version" >> "$GITHUB_ENV"
+
+          git fetch origin main --no-tags
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Release tag '$tag' must point to a commit on main"
+            exit 1
+          fi
+          echo "Releasing $version from $GITHUB_SHA"
+
+      - uses: cachix/install-nix-action@v31
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/daemon
+            ~/.gradle/native
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Build and publish package
+        run: >-
+          nix develop --command gradle --no-daemon build :lib:publish
+          -Pversion="$VERSION"
+
+      - name: Create GitHub release
+        shell: bash
+        run: |
+          mkdir -p build/release-assets
+          cp \
+            "lib/build/libs/typejava-$VERSION.jar" \
+            "lib/build/libs/typejava-$VERSION-sources.jar" \
+            "lib/build/libs/typejava-$VERSION-javadoc.jar" \
+            "cli/build/libs/typejava-$VERSION-all.jar" \
+            build/release-assets/
+          cd build/release-assets
+
+          sha256sum \
